@@ -75,3 +75,16 @@ describe("provider registry", () => {
     expect(s.find((p) => p.id === "tiktok")!.state).toBe("manual");
   });
 });
+
+describe("manual Meta Ad Library links", () => {
+  it("open on the US by default and can be changed", async () => {
+    const { keywordLibraryUrl } = await import("@/lib/providers/meta-ad-library");
+    expect(keywordLibraryUrl("Acme")).toContain("country=US");
+    process.env.AD_LIBRARY_LINK_COUNTRY = "all";
+    try {
+      expect(keywordLibraryUrl("Acme")).toContain("country=ALL");
+    } finally {
+      delete process.env.AD_LIBRARY_LINK_COUNTRY;
+    }
+  });
+});

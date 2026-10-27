@@ -33,12 +33,17 @@ export function publicAdUrl(id: string): string {
   return `https://www.facebook.com/ads/library/?id=${encodeURIComponent(id)}`;
 }
 
+/** Country the manual Ad Library links open on. The public site covers US ads even though the API doesn't. */
+function linkCountry(): string {
+  return (process.env.AD_LIBRARY_LINK_COUNTRY || "US").trim().toUpperCase();
+}
+
 export function advertiserLibraryUrl(pageId: string): string {
-  return `https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=ALL&view_all_page_id=${encodeURIComponent(pageId)}`;
+  return `https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=${linkCountry()}&view_all_page_id=${encodeURIComponent(pageId)}`;
 }
 
 export function keywordLibraryUrl(name: string): string {
-  return `https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=ALL&q=${encodeURIComponent(name)}&search_type=keyword_unordered`;
+  return `https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=${linkCountry()}&q=${encodeURIComponent(name)}&search_type=keyword_unordered`;
 }
 
 function nameMatches(pageName: string | undefined, brand: string): boolean {
@@ -85,7 +90,7 @@ export const metaAdLibraryProvider: EvidenceProvider = {
   access: "official_api",
   description:
     "Official Graph API. Returns commercial ads only where they were delivered in the EU/UK (plus political/issue ads globally). Not finding ads here doesn't mean the brand doesn't advertise.",
-  configVars: ["META_AD_LIBRARY_ACCESS_TOKEN", "META_GRAPH_API_VERSION", "META_AD_REACHED_COUNTRIES"],
+  configVars: ["META_AD_LIBRARY_ACCESS_TOKEN", "META_GRAPH_API_VERSION", "META_AD_REACHED_COUNTRIES", "AD_LIBRARY_LINK_COUNTRY"],
   availability() {
     return process.env.META_AD_LIBRARY_ACCESS_TOKEN
       ? { state: "ok", message: "Configured. Coverage for commercial ads is limited to EU/UK delivery." }
